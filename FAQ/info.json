@@ -1,0 +1,13 @@
+{
+  "name": "FAQ",
+  "handle": "FAQ",
+  "info": "Let your customers ask questions and manage the answers",
+  "settings": true,
+  "docs": "https://github.com/sellfino/app-faq",
+  "author": {
+    "name": "Lucas • Sellfino",
+    "url": "https://www.sellfino.com"
+  },
+  "version": "1.0.0",
+  "queue": true
+}
