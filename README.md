@@ -3,10 +3,15 @@
 ---
 
 ## FAQ
-Let your customers ask questions and manage the answers
+Let your customers ask questions and manage the answers.
+
+## Demo & Screenshots
+Check how this app works in the live store: [DEMO](https://sellfino.myshopify.com/products/grey-tie-faq)
+
+<a href="https://sellfino.com/images/screens/faq/faq-1.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-1.jpg"></a> <a href="https://sellfino.com/images/screens/faq/faq-2.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-2.jpg"></a> <a href="https://sellfino.com/images/screens/faq/faq-3.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-3.jpg"></a> <a href="https://sellfino.com/images/screens/faq/faq-4.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-4.jpg"></a> <a href="https://sellfino.com/images/screens/faq/faq-5.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-5.jpg"></a> <a href="https://sellfino.com/images/screens/faq/faq-6.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-6.jpg"></a> <a href="https://sellfino.com/images/screens/faq/faq-7.jpg" target="_blank" rel="noopener noreferrer"><img width="24%" src="https://sellfino.com/images/screens/faq/faq-7.jpg"></a>
 
 ## Installation
-Coming Soon
+Coming Soon. Email notifications - coming soon.
 
 ## Sellfino Open Source Shopify App Store
 This is the app for [Sellfino](https://github.com/sellfino/sellfino) platform.
