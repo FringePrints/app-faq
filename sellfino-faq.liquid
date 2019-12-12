@@ -1,0 +1,163 @@
+{% for tag in product.tags %}
+  {% if tag contains 'faq-' %}
+  {% assign faq_id = tag %}
+    {% assign faq_slug = 'sellfinofaq/' | append: tag %}
+    {% assign faq_article = articles[faq_slug] %}
+    {% assign faq = faq_article.metafields.sellfino.faq %}
+  {% endif %}
+{% endfor %}
+
+{% if faq %}
+  {% assign show = true %}
+{% else %}
+  {% if section.settings.always_visible %}
+  {% assign show = true %}
+  {% endif %}
+{% endif %}
+
+{% if show %}
+  <div id="sellfino-faq">
+    <h3>Frequently Asked Questions</h3>
+    <div class="rows">
+      {% for row in faq.questions %}
+      {% if row.active %}
+      <div class="row">
+        <div class="question">{{ row.question }} <div class="details">Asked by <em>{{ row.author.name }}</em> on {{ row.created_at | date: '%Y / %m / %d at %H:%M' }}</div> <span></span></div>
+        <div class="answers">
+          {% for subrow in row.answers %}
+          {% if subrow.active %}
+          <div class="answer">
+            {{ subrow.answer }}
+            <div class="details">Answered by <em>{{ subrow.author.name }}</em> on {{ subrow.created_at | date: '%Y / %m / %d at %H:%M' }}</div>
+          </div>
+          {% endif %}
+          {% endfor %}
+
+          <h4>Answer this question</h4>
+          <form data-ref="https://sam.sellfino.com/app/FAQ/answer?shop={{ shop.permanent_domain }}">
+            <div style="display:none">
+              <input name="pot" />
+              <input type="hidden" name="id" value="{{ faq_id }}" />
+              <input type="hidden" name="question_id" value="{{ row.id }}" />
+            </div>
+            <div class="success"><strong>Thank you! Your answer was sent.</strong></div>
+            <input type="text" name="answer" placeholder="Your answer *" required value="" autocomplete="off" />
+            <div class="columns">
+              <div><input type="text" name="author[name]" placeholder="Your name *" required value="" autocomplete="off" /></div>
+              <div><input type="email" name="author[email]" placeholder="Your email address *" required value="" autocomplete="off" /></div>
+              <div><button type="submit">Send</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <div class="ask">
+      <h3>Ask new question</h3>
+      <form data-ref="https://sam.sellfino.com/app/FAQ/ask?shop={{ shop.permanent_domain }}">
+        <div style="display:none">
+          <input name="pot" />
+          <input type="hidden" name="id" value="{{ faq_id }}" />
+          <input type="hidden" name="product_id" value="{{ product.id }}" />
+        </div>
+        <div class="success"><strong>Thank you! Your question was sent.</strong> When somebody answer it, we will notify you by email.</div>
+        <input type="text" name="question" placeholder="Your question *" required value="" autocomplete="off" />
+        <div class="columns">
+          <div><input type="text" name="author[name]" placeholder="Your name *" required value="" autocomplete="off" /></div>
+          <div><input type="email" name="author[email]" placeholder="Your email address *" required value="" autocomplete="off" /></div>
+          <div><button type="submit">Send</button></div>
+        </div>
+        <div class="req">* Fields are required</div>
+      </form>
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Sellfino FAQ",
+    "settings": [
+    {
+      "type":"checkbox",
+      "id":"always_visible",
+      "label":"Show FAQ form always"
+        }
+    ]
+  }
+{% endschema %}
+
+{% stylesheet %}
+  #sellfino-faq { padding-bottom: 50px; }
+    #sellfino-faq h3, #sellfino-faq h4 { text-align: center; }
+    #sellfino-faq .question { padding: 15px 40px 15px 0; color: #7288a2; font-size: 1.15rem; position: relative; cursor: pointer; }
+    #sellfino-faq .question span { position: absolute; top: 23px; right: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid #7288a2; }
+    #sellfino-faq .question span::before { content: ''; position: absolute; display: block; width: 1px; height: 11px; left: 50%; top: 9px; background: #7288a2; }
+    #sellfino-faq .question span::after { content: ''; position: absolute; display: block; height: 1px; width: 11px; top: 50%; left: 9px; background: #7288a2; }
+    #sellfino-faq .details { font-size: 60%; color: #b1b3b5; text-transform: uppercase }
+    #sellfino-faq .details em { font-style: normal; color: #d8232f }
+    #sellfino-faq .rows { margin-bottom: 25px; }
+    #sellfino-faq .row { border-bottom: 1px solid #e5e5e5; }
+    #sellfino-faq .row:first-child { border-top: 1px solid #e5e5e5; }
+    #sellfino-faq .row.open .question span::before { display: none; }
+    #sellfino-faq .row:hover .question, #sellfino-faq .row.open .question { color: #d8232f; }
+    #sellfino-faq .row:hover .question span, #sellfino-faq .row.open .question span { border-color: #d8232f; }
+    #sellfino-faq .row:hover .question span::before, #sellfino-faq .row.open .question span::before { background: #d8232f; }
+    #sellfino-faq .row:hover .question span::after, #sellfino-faq .row.open .question span::after { background: #d8232f; }
+    #sellfino-faq .answers { display: none; padding: 15px 25px 25px; }
+    #sellfino-faq .answers h4 { margin-top: 25px; }
+    #sellfino-faq .row.open .answers { display: block; }
+    #sellfino-faq .answer + .answer { margin-top: 20px }
+    #sellfino-faq form { position: relative; }
+    #sellfino-faq form > * { position: relative; transition: all .2s ease; }
+    #sellfino-faq form .success { opacity: 0; visibility: hidden; position: absolute; top: 50%; left: 0; -webkit-transform: translateY(-50%); transform: translateY(-50%); text-align: center; width: 100%; }
+    #sellfino-faq form .success strong { display: block; margin-bottom: 10px; color: #23d88c; }
+    #sellfino-faq form input { width: 100%; margin: 5px 0; border-radius: 3px; }
+    #sellfino-faq form .columns { display: -webkit-flex; display: flex; margin: 0 -5px; }
+    #sellfino-faq form .columns > div { width: 33.33%; padding: 0 5px; }
+    #sellfino-faq form .req { font-size: 11px; opacity: .5; font-style: italic; margin-top: 5px; }
+    #sellfino-faq form button { transition: background .2s ease; margin-top: 5px; padding: 15px 5px; border-radius: 3px; display: block; width: 100%; font-size: 0.76471em; font-weight: 700; text-transform: uppercase; cursor: pointer; border: 1px solid transparent; color: #fff; background: #d8232f; text-align: center; text-decoration: none; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+    #sellfino-faq form button:hover { background-color: #ac1c25; }
+    #sellfino-faq form.sent > * { opacity: 0; pointer-events: none; }
+    #sellfino-faq form.sent > .success { opacity: 1; visibility: visible; }
+    #sellfino-faq form.loading > * { opacity: .3; pointer-events: none; }
+    #sellfino-faq form.loading > .success { opacity: 0; }
+    #sellfino-faq form.loading::after { content: ''; display: block; position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; margin-left: -25px; margin-top: -25px; border: 5px solid #7288a2; border-right-color: transparent; border-top-color: transparent; border-radius: 50%; -webkit-animation: rotate .5s linear 0s infinite; -moz-animation: rotate .5s linear 0s infinite;  -ms-animation: rotate .5s linear 0s infinite;  -o-animation: rotate .5s linear 0s infinite; animation: rotate .5s linear 0s infinite; }
+  
+  @-webkit-keyframes rotate { 100% { transform: rotate(1turn); } }
+    @-moz-keyframes rotate {  100% { transform: rotate(1turn); } }
+    @-ms-keyframes rotate { 100% { transform: rotate(1turn); } }
+    @-o-keyframes rotate {  100% { transform: rotate(1turn); } }
+    @keyframes rotate { 100% { transform: rotate(1turn); } }
+{% endstylesheet %}
+
+{% javascript %}
+  document.querySelectorAll('#sellfino-faq .question').forEach(function(q) {
+      q.addEventListener('click', function(e) {
+        q.parentElement.classList.toggle('open')
+      })
+    })
+    document.querySelectorAll('#sellfino-faq form').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault()
+        if (form.pot.value == '') {
+          form.classList.add('loading')
+          params = {
+            method: 'POST',
+            body: new FormData(form)
+          }
+
+          fetch(form.dataset.ref, params)
+          .then(function(res) { return res.json() })
+          .then(function() {
+            form.classList.add('sent')
+            form.classList.remove('loading')
+          })
+          .catch(function(error) {
+            alert(error)
+            form.classList.remove('loading')
+          })
+        }
+      })
+    })
+{% endjavascript %}
