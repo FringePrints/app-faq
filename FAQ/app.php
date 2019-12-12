@@ -60,6 +60,14 @@ Class App
         $this->delete();
         break;
 
+      case 'ask':
+        $this->ask();
+        break;
+
+      case 'answer':
+        $this->answer();
+        break;
+
     }
 
   }
@@ -329,6 +337,173 @@ Class App
     } else {
 
       Helpers::error(404);
+
+    }
+
+  }
+
+  public function ask()
+  {
+
+    if (isset($_REQUEST['id']) && isset($_REQUEST['question']) && isset($_REQUEST['author']['name']) && isset($_REQUEST['author']['email'])) {
+
+      if (!filter_var($_REQUEST['author']['email'], FILTER_VALIDATE_EMAIL)) {
+        Helpers::error(400);
+      }
+
+      $items = DB::get('faqs', 'FAQ.json');
+      $found = array_search($_REQUEST['id'], array_column($items, 'id'));
+
+      if (!is_bool($found)) {
+
+        $items[$found]['questions'][] = [
+          'id' => uniqid(),
+          'question' => $_REQUEST['question'],
+          'active' => !$items[$found]['moderate']['questions'],
+          'answers' => [],
+          'author' => $_REQUEST['author'],
+          'created_at' => date('Y-m-d\TH:i:s')
+        ];
+
+        DB::put('faqs', $items, 'FAQ.json');
+
+        $blog_id = DB::get('blog_id', 'FAQ.json');
+        $meta = [
+          'metafield' => [
+            'id' => $items[$found]['metafield_id'],
+            'value' => json_encode($items[$found])
+          ]
+        ];
+        Shopify::request('blogs/' . $blog_id . '/articles/' . $items[$found]['article_id'] . '/metafields/' . $items[$found]['metafield_id'], $meta, 'PUT');
+
+      } else {
+
+        $res = Shopify::request('products/' . $_REQUEST['product_id']);
+        $res = json_decode($res, true);
+        $product = $res['product'];
+        $blog_id = DB::get('blog_id', 'FAQ.json');
+        $id = 'faq-' . Helpers::slugify($product['title']);
+
+        $article = [
+          'article' => [
+            'title' => $id
+          ]
+        ];
+
+        $res = Shopify::request('blogs/' . $blog_id . '/articles', $article, 'POST');
+        $res = json_decode($res, true);
+        $article_id = $res['article']['id'];
+
+        $data = [
+          'id' => $id,
+          'name' => $product['title'],
+          'created_at' => date('Y-m-d\TH:i:s'),
+          'moderate' => [
+            'questions' => 1,
+            'answers' => 1
+          ],
+          'questions' => [
+            [
+              'id' => uniqid(),
+              'question' => $_REQUEST['question'],
+              'active' => 0,
+              'answers' => [],
+              'author' => $_REQUEST['author'],
+              'created_at' => date('Y-m-d\TH:i:s')
+            ]
+          ],
+          'article_id' => $article_id
+        ];
+
+        $meta = [
+          'metafield' => [
+            'namespace' => 'sellfino',
+            'key' => 'faq',
+            'value' => json_encode($data),
+            'value_type' => 'json_string'
+          ]
+        ];
+
+        $res = Shopify::request('blogs/' . $blog_id . '/articles/' . $article_id . '/metafields', $meta, 'POST');
+        $res = json_decode($res, true);
+        $data['metafield_id'] = $res['metafield']['id'];
+
+        $items[] = $data;
+        DB::put('faqs', $items, 'FAQ.json');
+
+        $prometa = [
+          'product' => [
+            'id' => $_REQUEST['product_id'],
+            'tags' => (strlen($product['tags']) > 0 ? ', ' : '') . $id,
+          ]
+        ];
+
+        Shopify::request('products/' . $product['id'], $prometa, 'PUT');
+
+      }
+
+
+      Helpers::success();
+
+    } else {
+
+      Helpers::error(400);
+
+    }
+
+  }
+
+  public function answer()
+  {
+
+    if (isset($_REQUEST['id']) && isset($_REQUEST['answer']) && isset($_REQUEST['author']['name']) && isset($_REQUEST['author']['email'])) {
+
+      if (!filter_var($_REQUEST['author']['email'], FILTER_VALIDATE_EMAIL)) {
+        Helpers::error(400);
+      }
+
+      $items = DB::get('faqs', 'FAQ.json');
+      $found = array_search($_REQUEST['id'], array_column($items, 'id'));
+
+      if (!is_bool($found)) {
+
+        $question_key = array_search($_REQUEST['question_id'], array_column($items[$found]['questions'], 'id'));
+
+        if (!is_bool($question_key)) {
+
+          $items[$found]['questions'][$question_key]['answers'][] = [
+            'id' => uniqid(),
+            'answer' => $_REQUEST['answer'],
+            'author' => $_REQUEST['author'],
+            'created_at' => date('Y-m-d\TH:i:s'),
+            'active' => !$items[$found]['moderate']['answers']
+          ];
+
+          DB::put('faqs', $items, 'FAQ.json');
+
+          $blog_id = DB::get('blog_id', 'FAQ.json');
+          $meta = [
+            'metafield' => [
+              'id' => $items[$found]['metafield_id'],
+              'value' => json_encode($items[$found])
+            ]
+          ];
+          Shopify::request('blogs/' . $blog_id . '/articles/' . $items[$found]['article_id'] . '/metafields/' . $items[$found]['metafield_id'], $meta, 'PUT');
+
+        }
+
+        Helpers::success();
+
+      } else {
+
+        Helpers::error(404);
+
+      }
+
+
+    } else {
+
+      Helpers::error(400);
 
     }
 

@@ -27,7 +27,7 @@
                         <i class="fas" :class="{ 'fa-toggle-off' : !answer.active, 'fa-toggle-on' : answer.active }"></i>
                       </a>
                       <a class="btn btn-icon-only text-danger" @click.prevent="remove(answer)">
-                        <i class="fas fa-minus-circle"></i>
+                        <i class="fas fa-trash-alt"></i>
                       </a>
                       <a class="btn btn-icon-only text-light drag" style="cursor:move">
                         <i class="fas fa-arrows-alt-v"></i>
@@ -87,9 +87,9 @@ module.exports = {
     add: function() {
       this.question.answers.push({
         id: uniqid(),
-        active: true,
         answer: '',
         author: { name: '', email: '' },
+        active: true,
         created_at: current_date()
       })
     },
