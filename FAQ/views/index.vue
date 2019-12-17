@@ -381,12 +381,6 @@ module.exports = {
     prevPage: function() {
       this.page--
       this.load(this.tabActive)
-    },
-    date_format: function(date) {
-      d = new Date(date)
-      datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-      d.getFullYear() + " || " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-      return datestring
     }
   },
   mounted: function() {
